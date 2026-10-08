@@ -474,7 +474,11 @@
     const values = card.querySelectorAll('dd');
     values[0].textContent = unit.address || 'A confirmar com a equipe';
     values[1].textContent = unit.hours || 'Consulte com a equipe';
-    if (unit.map) card.querySelector('.control-note').textContent = 'Abrir mapa';
+    if (unit.map) {
+      const link = card.querySelector('.map-link');
+      link.href = unit.map; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.querySelector('.control-note').textContent = 'Google Maps';
+    }
   });
   // Clube: mesmos campos, mesma ordem, exemplos sem condições comerciais inventadas.
   document.querySelectorAll('input[name="modalidade"]').forEach(input => input.addEventListener('change', () => {
@@ -497,8 +501,9 @@
   const carousel = document.querySelector('#equipe-lista');
   const prev = document.querySelector('#equipe-anterior');
   const next = document.querySelector('#equipe-proximo');
-  prev.hidden = next.hidden = false;
   const updateCarousel = () => {
+    const overflow = carousel.scrollWidth > carousel.clientWidth + 2;
+    prev.hidden = next.hidden = !overflow;
     prev.disabled = carousel.scrollLeft <= 2;
     next.disabled = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 2;
   };
@@ -512,33 +517,9 @@
   carousel.addEventListener('keydown', event => {
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); moveCarousel(event.key === 'ArrowRight' ? 1 : -1); }
   });
-  // Mapas: modal demonstrativo com foco contido e restituição ao controle.
-  let opened = null, opener = null;
-  const closeMap = () => {
-    if (!opened) return;
-    opened.removeAttribute('data-open'); opened = null;
-    page.inert = false; document.querySelector('.navigation').inert = false; document.querySelector('.whatsapp-dock').inert = false;
-    opener?.focus({preventScroll: true}); opener = null;
-  };
-  document.querySelectorAll('.map-link').forEach(link => link.addEventListener('click', event => {
-    const unit = config.units[link.dataset.unit];
-    if (unit.map) { link.href = unit.map; link.target = '_blank'; link.rel = 'noopener noreferrer'; return; }
-    event.preventDefault();
-    opened = document.querySelector(link.hash); opener = link;
-    opened.setAttribute('data-open', '');
-    page.inert = true; document.querySelector('.navigation').inert = true; document.querySelector('.whatsapp-dock').inert = true;
-    opened.querySelector('.close-map').focus();
-  }));
-  document.querySelectorAll('.map-dialog').forEach(dialog => {
-    dialog.querySelector('.close-map').addEventListener('click', event => { if (opened) { event.preventDefault(); closeMap(); } });
-    dialog.addEventListener('click', event => { if (event.target === dialog) closeMap(); });
-  });
+  // Mapas externos funcionam também sem JavaScript.
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      if (opened) closeMap();
-      else if (mobile.matches && menu.open) closeNavigation();
-    }
-    if (opened && event.key === 'Tab') { event.preventDefault(); opened.querySelector('.close-map').focus(); }
+    if (event.key === 'Escape' && mobile.matches && menu.open) closeNavigation();
   });
   updateCarousel(); updateFromScroll();
   if (location.hash && sections.some(s => '#' + s.id === location.hash)) scrollToSection(location.hash.slice(1));
