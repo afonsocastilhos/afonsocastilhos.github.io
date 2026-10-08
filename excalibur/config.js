@@ -4,7 +4,7 @@ window.EXCALIBUR_CONFIG = {
     "whatsapp": "https://wa.me/5554991654498",
     "app": "https://cashbarber.com.br/excaliburbarbearia",
     "instagram": "https://www.instagram.com/excaliburbarbeariacx/",
-    "bio": "https://excalibur-bio.afonso-lch.chatgpt.site"
+    "bio": "bio/"
   },
   "messages": {
     "agendamento": "Oi! Gostaria de agendar um horário! Vim pelo site da Excalibur.",
